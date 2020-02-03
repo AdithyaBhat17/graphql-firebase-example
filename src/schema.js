@@ -1,5 +1,5 @@
-import { makeExecutableSchema } from 'graphql-tools';
-import { resolvers } from './resolvers';
+import { makeExecutableSchema } from "graphql-tools";
+import { resolvers } from "./resolvers";
 
 const typeDefs = `
   type Booking {
@@ -12,18 +12,18 @@ const typeDefs = `
   }
 
   type User {
-      id: ID!
       email: String!
       name: String!
       uid: String!
       bookings: [Booking]
+      token: String
   }
 
   type Query {
       getUsers: [User]
       getBookings: [Booking]
-      getUser(id: ID!): User
-      getBooking(id: ID!): Booking
+      getUser(uid: String!): User
+      getBookingsForUser(user_id: String!): [Booking]
   }
 
   input BookingInput {
@@ -35,14 +35,22 @@ const typeDefs = `
       user_id: String!
   }
 
+  input AuthInput {
+      email: String!
+      password: String!
+      username: String!
+  }
+
   type Mutation {
       addBooking(booking: BookingInput): Booking
+      signUp(user: AuthInput): User
+      logIn(user:AuthInput): User
   }
 `;
 
 const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers,
+  typeDefs,
+  resolvers
 });
 
 export default schema;
