@@ -9,6 +9,7 @@ const typeDefs = `
       time: String!
       price: Int
       user_id: String!
+      address: String!
   }
 
   type User {
@@ -20,10 +21,10 @@ const typeDefs = `
   }
 
   type Query {
-      getUsers: [User]
-      getBookings: [Booking]
-      getUser(uid: String!): User
-      getBookingsForUser(user_id: String!): [Booking]
+      users: [User]
+      bookings: [Booking]
+      user(uid: String!): User
+      bookingsForUser(user_id: String!): [Booking]
   }
 
   input BookingInput {
@@ -33,18 +34,21 @@ const typeDefs = `
       type: String
       price: Int
       user_id: String!
+      address: String!
+      token: String!
+      uid: String!
   }
 
   input AuthInput {
       email: String!
       password: String!
-      username: String!
+      username: String
   }
 
   type Mutation {
       addBooking(booking: BookingInput): Booking
       signUp(user: AuthInput): User
-      logIn(user:AuthInput): User
+      loginUser(user:AuthInput): User
   }
 `;
 

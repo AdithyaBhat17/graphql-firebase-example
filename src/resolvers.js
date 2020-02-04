@@ -2,7 +2,7 @@ import { admin, client } from "./firebase";
 
 export const resolvers = {
   Query: {
-    async getUsers() {
+    users: async () => {
       try {
         let allUsers = [];
         let users = await admin
@@ -15,7 +15,7 @@ export const resolvers = {
         return error;
       }
     },
-    async getUser(_root, { uid }) {
+    user: async (_root, { uid }) => {
       try {
         let user = await admin
           .firestore()
@@ -27,24 +27,20 @@ export const resolvers = {
         return error;
       }
     },
-    async getBookings() {
+    bookings: async (_root, {}, context) => {
       try {
         let allBookings = [];
         let bookings = await admin
           .firestore()
           .collection("bookings")
           .get();
-        bookings.forEach(
-          booking =>
-            console.log(booking.data()) || allBookings.push(booking.data())
-        );
-        console.log(allBookings);
+        bookings.forEach(booking => allBookings.push(booking.data()));
         return allBookings;
       } catch (error) {
         return error;
       }
     },
-    async getBookingsForUser(_root, { user_id }) {
+    bookingsForUser: async (_root, { user_id }) => {
       try {
         let bookings = [];
         let data = await admin
@@ -64,6 +60,7 @@ export const resolvers = {
   },
   Mutation: {
     async addBooking(_root, { booking }) {
+      // @todo handle payments
       try {
         await admin
           .firestore()
@@ -95,7 +92,28 @@ export const resolvers = {
       } catch (error) {
         return error;
       }
+    },
+    async loginUser(_root, { user }) {
+      try {
+        let userDetails = {};
+        let _user = await client
+          .auth()
+          .signInWithEmailAndPassword(user.email, user.password);
+        userDetails.uid = _user.user.uid;
+        userDetails.token = await _user.user.getIdToken(true);
+        userDetails.email = _user.user.email;
+        let additionalInfo = await admin
+          .firestore()
+          .collection("users")
+          .doc(userDetails.uid)
+          .get();
+        userDetails.name = additionalInfo.data().name;
+        userDetails.bookings = additionalInfo.data().bookings;
+        return userDetails;
+      } catch (error) {
+        return error;
+      }
     }
-    // @todo add login functionality
+    // @todo add logout functionality
   }
 };
