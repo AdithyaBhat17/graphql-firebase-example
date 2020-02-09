@@ -19,4 +19,4 @@ const firebaseConfig = {
 
 let client = firebase.initializeApp(firebaseConfig);
 
-export { admin, client };
+export { admin, client, firebase };
